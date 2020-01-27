@@ -31,6 +31,7 @@ in
       # Pre-build the image because we don't want to build the world
       # in the vm.
       (preEval [ ../../examples/minimal/arion-compose.nix ]).config.out.dockerComposeYaml
+      (preEval [ ../../examples/custom-image/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/full-nixos/arion-compose.nix ]).config.out.dockerComposeYaml
       (preEval [ ../../examples/nixos-unit/arion-compose.nix ]).config.out.dockerComposeYaml
       pkgs.stdenv
@@ -53,6 +54,7 @@ in
     };
 
     $makeSubtest->("minimal", "${../../examples/minimal}");
+    $makeSubtest->("custom-image", "${../../examples/custom-image}");
     $makeSubtest->("full-nixos", "${../../examples/full-nixos}", sub {
       $machine->succeed("cd work && export NIX_PATH=nixpkgs='${pkgs.path}' && (echo 'nix run -f ~/h/arion arion -c arion exec webserver'; echo 'target=world; echo Hello \$target'; echo exit) | script /dev/null | grep 'Hello world'");
     });
