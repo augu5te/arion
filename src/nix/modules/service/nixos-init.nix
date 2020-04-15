@@ -16,6 +16,13 @@ in
         Configure NixOS with the `nixos.configuration` option.
       '';
     };
+    nixos.runWrappersUnsafe = lib.mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        When enabled, /run/wrappers is mounted with exec,suid attributs is considered UNSAFE within context.
+      '';
+    };
   };
 
   config = lib.mkIf (config.nixos.useSystemd) {
@@ -32,7 +39,7 @@ in
     ];
     service.tmpfs = [
       "/run"          # noexec is fine because exes should be symlinked from elsewhere anyway
-      "/run/wrappers" # noexec breaks this intentionally
+      ("/run/wrappers" + (lib.optionalString (config.nixos.runWrappersUnsafe) ":exec,suid"))  # by default noexec breaks this intentionally and no suid
     ] ++ lib.optional (config.nixos.evaluatedConfig.boot.tmpOnTmpfs) "/tmp:exec,mode=777";
 
     service.stop_signal = "SIGRTMIN+3";
